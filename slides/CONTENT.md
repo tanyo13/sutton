@@ -17,7 +17,7 @@ class: center, middle
     * `$\mathcal{A}$`: 行動
     * `$\mathcal{R} \subset \mathbb{R}$`: 報酬
     * `$p(s', r \mid s, a)$` : ダイナミクス関数 (確率を返す)
-* `$S_t, A_t, R_t$` (`$t$` は時刻 0, 1, ...) : 対応する確率変数
+* `\(S_t, A_t, R_t\)` (`$t$` は時刻 0, 1, ...) : 対応する確率変数
 * `$G_t := \sum_{k = 0}^\infty \gamma^k R_{t+k+1}$`: 収益, 
   `$\gamma$`: 割引因子
 * ポリシー関数 `$\pi(a \mid s)\quad$`   (確率を返す)
