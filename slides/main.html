@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+
+<!-- NOTE: to run, invoke a web server, e.g. by
+         python3 -m http.server
+     in this directory.
+  -->
+
+<html>
+  <head>
+    <title>勉強会190903</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <style type="text/css">
+      /* Slideshow styles */
+      .rightFloat {
+        float: right;
+        margin-left: 1em;
+      }
+      .remark-slide-content {
+	  font-size: 22px;
+	  padding-left: 2em;
+      }
+      .remark-slide-content h1 {
+	  margin-top: 0;
+      }
+
+      // For correct printing to PDF
+      @page {
+	  // size: 1210px 681px;
+	  size: 1024px 768px;
+	  margin: 0;
+      }
+      @media print {
+	  .remark-slide-scaler {
+	      width: 100% !important;
+	      height: 100% !important;
+	      transform: scale(1) !important;
+	      top: 0 !important;
+	      left: 0 !important;
+	  }
+      }
+
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+    </textarea>
+    <script src="http://gnab.github.io/remark/downloads/remark-latest.min.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS_HTML&delayStartupUntil=configured" type="text/javascript"></script>
+    <script type="text/javascript">
+      var slideshow = remark.create({
+	  sourceUrl: 'CONTENT.md',
+	  ratio: '4:3',
+	  countIncrementalSlides: false,
+      });
+
+      // Setup MathJax
+      MathJax.Hub.Config({
+          tex2jax: {
+              skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+	      inlineMath: [ ['$','$'], ['\\(','\\)'] ]
+          }
+      });
+
+      MathJax.Hub.Configured();
+    </script>
+  </body>
+</html>

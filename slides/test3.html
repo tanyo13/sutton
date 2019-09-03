@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Title</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <style type="text/css">
+      /* Slideshow styles */
+      .rightxx {
+        float: right;
+        margin-left: 1em;
+      }
+      .remark-slide-content { font-size: 22px; }
+
+      @page {
+	  // size: 1210px 681px;
+	  size: 1024px 768px;
+	  margin: 0;
+      }
+
+      @media print {
+	  .remark-slide-scaler {
+	      width: 100% !important;
+	      height: 100% !important;
+	      transform: scale(1) !important;
+	      top: 0 !important;
+	      left: 0 !important;
+	  }
+      }
+
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+
+class: center, middle
+ 
+# `\(\LaTeX{}\)` in remark
+ 
+---
+ 
+# Display and Inline
+ 
+1. This is an inline integral: `\(\int_a^bf(x)dx\)`
+2. More `\(x={a \over b}\)` formulae.
+ 
+Display formula:
+
+$$e^{i\pi} + 1 = 0$$
+
+---
+
+* Bye
+
+.rightxx[![Right-aligned image](https://images-na.ssl-images-amazon.com/images/G/01/img15/pet-products/small-tiles/23695_pets_vertical_store_dogs_small_tile_8._CB312176604_.jpg)]
+
+* Hello
+* 2つめ
+* 文章もっと長いもっと長いもっと長いもっと長いもっと長いもっと長いもっと長い
+  もっと長いもっと長いもっと長いもっと長いもっと長い
+
+---
+
+## 復習: 記号など
+
+* MDP (Malkov Decision Process)
+    * `\(\LaTeX{} \mathcal{S}\)` in remark
+    * `\(\mathcal{S}\)`: 状態
+    * `$\mathcal{A}$`: 行動
+    * `$\mathcal{R} \subset \mathbb{R}$`: 報酬
+    * `$p(s', r \mid s, a)$` : ダイナミクス関数 (確率を返す)
+* `$S_t, A_t, R_t$` (`$t$` は時刻 0, 1, ...) : 対応する確率変数
+* `$G_t := \sum_{k = 0}^\infty \gamma^k R_{t+k+1}$`: 収益, 
+  `$\gamma$`: 割引因子
+* ポリシー関数 `$\pi(a \mid s)$`   \quad(確率を返す)
+* 価値関数 `$v_\pi(s) := \mathbb{E}_\pi[G_t \mid S_t = s]$`
+* 行動価値関数 `$q_\pi(s, a) := \mathbb{E}_\pi[G_t \mid S_t = s, A_t = a]$`
+* 最適価値関数 `$v_*(s) := \max_\pi v_\pi(s)$`
+* 最適行動価値関数 `$q_*(s, a) := \max_\pi q_\pi(s, a)$`
+
+---
+
+## テストページ
+
+$$ a^b = c $$
+
+地の文に入れる $ x^y = z $
+
+地の文に入れる．\( a * b \)  あいうえお
+
+\begin{equation}
+  y = \max \{ a * b \}
+\end{equation}
+
+
+
+
+
+---
+
+## 復習: Bellman 最適方程式
+
+`\begin{equation}
+  v_*(s) 
+  = \max_a\mathbb{E}[ R_{t+1} + \gamma v_*(S_{t+1}) \mid S_t = s, A_t = a ]
+    \tag{4.1}
+\end{equation}`
+
+`\begin{equation}
+  q_*(s, a) 
+  = \mathbb{E}[ R_{t+1} + \gamma \max_{a'} q_*(S_{t+1}, a') 
+               \mid S_t = s, A_t = a ]
+    \tag{4.2}
+\end{equation}`
+
+* これら (どちらでもよい) を満たす関数 `$ v_* $`, `$ q_* $` が
+  みつけられれば，最適ポリシーが決定できる．
+* 第4章では，この方程式を満たす関数を求める方法を扱う．
+
+---
+
+## 4.1 Policy Evaluation
+
+* まず，`$v_\pi$` の計算方法を考える．
+    * ポリシー評価とか予測問題とか呼ばれる．
+* 定義より:
+`\begin{equation}
+v_\pi(s) = \sum_a \pi(a \mid s)
+    \sum_{s', r} p(s', r \mid s, a) [ r + \gamma v_\pi(s') ]
+  \tag{4.4}
+\end{equation}`
+* 4.4 は，`$ |\mathcal{S}| $` 個の連立方程式なので，解ける．
+    * `0 < $\gamma < 1$` または パスはすべて有限と仮定している．
+* しかし，この考え方でよいのか? 確かに`$v_\pi$`は 4.4 の解だが，
+  4.4 の解が `$v_\pi$` になる保証はあるのだろうか?
+    * ここで紹介されている解法は問題なさそうだが．
+
+<!--
+`$ $`
+-->
+
+
+---
+
+### アルゴリズム: 反復ポリシー評価
+
+* 入力: `$\pi$`: 評価するポリシー
+* アルゴリズムパラメタ: `$\theta$`: 反復停止判断閾値
+* 初期化: `$V(s)$`を任意の値にする．ただし，終端状態 $s$ については
+  $V(s) = 0$ とすること．
+* 反復:
+    * $\Delta \leftarrow 0$
+    * 各 $s \in\mathcal{S}$ について
+        * $v \leftarrow V(s)$
+		* `$V(s) \leftarrow \sum_a \pi(a \mid s) \sum_{s',r} p(s', r \mid s, a) [r + \gamma V(s')] $`
+		* `$\Delta \leftarrow \max(\Delta, | v - V(s) |)$`
+* $\Delta < \theta$ となるまで
+
+---
+
+### 練習4-1
+
+TBD
+
+---
+
+## 4.2 Policy Improvement
+
+* しばらく，決定的なポリシー (1つ以外の選択肢の確率は0) 
+  $\pi$ を考える．
+  (確率 $\pi(s,a)$ の代わりに $\pi(s)$ で選んだ選択肢を表すことにする)
+* $s \in \mathcal{S}$，$a \in \mathcal{A}$ として，
+  `$q_\pi(s, a) > v_\pi(s)$` ならば，$\pi(s)$ の代わりに $a$ を選ぶように
+  変更した方が良いように思われる．実際次が成り立つ:
+
+#### ポリシー改善定理
+
+2つの決定的なポリシー $\pi$ と $\pi'$ について，
+
+任意の $s\in\mathcal{S}$ に対して `$q_\pi(s, \pi'(s)) \geq v_\pi(s)$`
+ならば，
+
+任意の$s\in\mathcal{S}$に対して`$v_{\pi'}(s) \geq v_\pi(s)$`
+である．
+
+---
+
+### ポリシー改善
+
+* $\pi$ に対して，
+すべての状態でポリシー改善定理を適用して，以下の改善ポリシー $\pi'$ を得る:
+* `\begin{align}
+\pi'(s) &:= \text{argmax}_a q_\pi(s, a)  \\
+  &= \text{argmax}_a \sum_{a',r} p(s',r \mid s,a)
+     [ r + \gamma v_\pi(s')]
+  \tag{4.9}
+\end{align}`
+* この結果，もし $\pi = \pi'$ であれば，(4.9) は，Bellman 方程式になる．
+  決定的ポリシーは有限個しかないので，
+  (Bellman 方程式の解の一意性が成り立つのであれば)
+  ポリシー改善を繰り返すと最適解に到達する．
+* 確率的ポリシーの場合も似たようなもの．
+
+---
+
+### 図4.1 の説明
+
+TBD
+
+---
+
+## 4.3 ポリシー反復
+
+* ポリシー評価とポリシー改善を交互に行って，最適ポリシーを得る方法を，
+  ポリシー反復と呼ぶ．
+* アルゴリズムは次スライド
+
+---
+
+1. 初期化: $s\in\mathcal{S}$に対して，$V(s)$ と
+   $\pi(s)$ を任意に取る．
+2. ポリシー評価
+    * 反復:
+        * $\Delta \leftarrow 0$
+        * 各 $s \in\mathcal{S}$ について
+            * $v \leftarrow V(s)$
+    		* `$V(s) \leftarrow \sum_{s',r} p(s', r \mid s, \pi(s)) [r + \gamma V(s')] $`
+    		* `$\Delta \leftarrow \max(\Delta, | v - V(s) |)$`
+    * $\Delta < \theta$ となるまで
+3. ポリシー改善
+    * stable $\leftarrow$ true
+	* 各 $s \in\mathcal{S}$ について
+	    * old $\leftarrow \pi(s)$
+		* `$\pi(s) \leftarrow \text{argmax}_a \sum_{s',r} p(s',r \mid s,a)[r + \gamma V(s')]$`
+        * old $\neq \pi(s)$ なら，stable $\leftarrow$ false
+	* stable = true なら，`$v_\pi := V$` と `$\pi_* := \pi$` を返して終了．
+	  そうでなければ2に戻る．
+
+---
+
+### 例4.2 レンタカー
+
+TBD
+
+---
+
+## 4.4 Value Iteration
+
+* ポリシー反復の弱点: 毎回のポリシー評価で全状態を何度も計算．
+* ポリシー評価を，途中で切り上げる手法がいろいろある．
+* 反復を1回で終わらせる手法を，価値反復と呼ぶ．
+
+アルゴリズムは次のようになる．
+
+
+
+1. $V$ を今までと同様に初期化．
+2. Repeat: 
+    * $v \leftarrow V$
+    * 各 $s \in \mathcal{S}$ に対して
+      `$V(s) \leftarrow \max_a\sum_{s',r} p(s',r\mid s,a)[r + \gamma V(s')]$`
+    * Until: `$\max_s | v(s) - V(s) | < \theta$`
+3. 出力:
+    * 価値関数 $V$
+    * ポリシー `$\pi(s) := \text{argmax}_a\sum_{s',r} p(s',r\mid s,a)[r + \gamma V(s')]$`
+
+---
+
+### 例4.3  ギャンブラー
+
+TBD
+
+---
+
+## 4.5 Asynchronous Dynamic Programming
+
+* DPの弱点: 全状態集合をなめる
+    * バックギャモンの状態集合の大きさは $10^{20}$ 以上．
+* 非同期DP
+    * 状態の更新順序制限を緩める．一部の状態を頻繁に更新してもよい．
+* 例:
+    * $k$回目の更新で，1状態 `$s_k$` のみを更新．
+	* $0 \leq \gamma < 1$ で，すべての $s \in \mathcal{S}$ が
+	  更新列に無限回現れれば，`$v_*$` への収束が保証される．
+* いつでも計算量が減るわけでは無いが，
+  うまくやれば早く有益な情報が得られることがある．→ 第8章
+* エージェントがMDP上で走るのと並行して対話的DPアルゴリズムを動かす．
+    * 例: エージェントが現在いる状態を更新対象にする．
+
+---
+
+## 4.6 Generalized Policy Iteration (GPI)
+
+* ポリシー評価とポリシー改善が交互に動作する．
+    * 粒度にはさまざまな場合がある．
+    * GPI: これらの総称．
+	  ほぼすべての強化学習の方式はGPIとみなせる．
+	  
+```
+$x = $y
+```
+
+* 1 ポリシー評価とポリシー改善が交互に動作する．
+    * 粒度にはさまざまな場合がある．
+    * GPI: これらの総称．
+	  ほぼすべての強化学習の方式はGPIとみなせる．
+* B ポリシー評価とポリシー改善が交互に動作する．
+    * 粒度にはさまざまな場合がある．
+    * GPI: これらの総称．
+	  ほぼすべての強化学習の方式はGPIとみなせる．
+* C ポリシー評価とポリシー改善が交互に動作する．
+    * 粒度にはさまざまな場合がある．
+    * GPI: これらの総称．
+	  ほぼすべての強化学習の方式はGPIとみなせる．
+* D ポリシー評価とポリシー改善が交互に動作する．
+    * 粒度にはさまざまな場合がある．
+    * GPI: これらの総称．
+	  ほぼすべての強化学習の方式はGPIとみなせる．
+
+
+
+
+    </textarea>
+    <script src="http://gnab.github.io/remark/downloads/remark-latest.min.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS_HTML&delayStartupUntil=configured" type="text/javascript"></script>
+    <script type="text/javascript">
+      var slideshow = remark.create();
+
+      // Setup MathJax
+      MathJax.Hub.Config({
+          tex2jax: {
+              skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+	      inlineMath: [ ['$','$'], ['\\(','\\)'] ]
+          }
+      });
+
+      MathJax.Hub.Configured();
+    </script>
+  </body>
+</html>
